@@ -10772,7 +10772,7 @@ expression)."
 (defun js2-parse-named-prop (tt pos previous-token)
   "Parse a name, string, or getter/setter object property.
 When `js2-is-in-destructuring' is t, forms like {a, b, c} will be permitted."
-  (let (is-rest
+  (let (is-rest dots
         (key (cond
               ;; Literal string keys: {'foo': 'bar'}
               ((= tt js2-STRING)
@@ -10796,9 +10796,10 @@ When `js2-is-in-destructuring' is t, forms like {a, b, c} will be permitted."
                     ;; but outside of destructuring ("spread") it can be any
                     ;; expression.
                     (= (js2-peek-token) js2-NAME))
-               (setq tt (js2-get-token)
+               (setq dots tt
+                     tt (js2-get-token)
                      is-rest t)
-               (js2-create-name-node))
+               (js2-make-unary dots (js2-create-name-node)))
               ;; Anything else is an error
               (t (js2-report-error "msg.bad.prop"))))
         (prop (and previous-token (js2-token-string previous-token)))
